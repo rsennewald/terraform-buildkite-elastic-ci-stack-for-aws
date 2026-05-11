@@ -77,6 +77,7 @@ module "buildkite_agents" {
 
   # Lifecycle management
   buildkite_terminate_instance_after_job = false
+  enable_warm_pool                       = true
 
   # Cost allocation tags
   enable_cost_allocation_tags = true

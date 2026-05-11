@@ -236,6 +236,28 @@ resource "aws_autoscaling_group" "agent_auto_scale_group" {
     "GroupDesiredCapacity"
   ]
 
+  dynamic "warm_pool" {
+    for_each = var.enable_warm_pool ? [1] : []
+    content {
+      pool_state = "Stopped"
+      min_size   = 0
+      instance_reuse_policy {
+        reuse_on_scale_in = true
+      }
+    }
+  }
+
+  dynamic "instance_refresh" {
+    for_each = var.enable_warm_pool ? [1] : []
+    content {
+      strategy = "Rolling"
+      preferences {
+        min_healthy_percentage = 100
+        skip_matching          = true
+      }
+    }
+  }
+
   dynamic "tag" {
     for_each = local.common_tags
     content {

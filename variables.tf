@@ -273,6 +273,37 @@ variable "instance_creation_timeout" {
   default     = ""
 }
 
+variable "enable_warm_pool" {
+  description = <<-EOT
+    Optional - Enable an ASG warm pool to keep pre-initialized instances ready
+    for faster scale-out. Defaults to false.
+
+    When enabled, instances that are scaled in (e.g. after idle self-termination)
+    are returned to the warm pool in a Stopped state instead of being terminated.
+    On the next scale-out, the ASG starts a stopped instance from the pool rather
+    than launching a new one, skipping boot and UserData time.
+
+    The following are hardcoded for safety with buildkite-agent workloads:
+
+    - pool_state = "Stopped": instances are fully shut down in the pool. "Running"
+      would leave the agent process up (able to pick up jobs on an out-of-service
+      instance) and "Hibernated" would freeze the agent mid-execution, resuming
+      with stale connections and tokens.
+
+    - min_size = 0: the ASG never launches fresh instances directly into the pool.
+      Doing so would start buildkite-agent on an instance that is about to be
+      stopped, risking a job being interrupted mid-execution.
+
+    - reuse_on_scale_in = true: this is the mechanism that populates the pool.
+
+    - instance_refresh with skip_matching and min_healthy_percentage = 100: when
+      the launch template changes (e.g. AMI update), stale instances in the pool
+      are flushed without disrupting in-service instances.
+  EOT
+  type    = bool
+  default = false
+}
+
 # =============================================================================
 # SCHEDULED SCALING CONFIGURATION
 # =============================================================================
