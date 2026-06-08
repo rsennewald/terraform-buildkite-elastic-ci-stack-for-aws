@@ -405,6 +405,12 @@ variable "enable_detailed_monitoring" {
   default     = false
 }
 
+variable "enable_nested_virtualization" {
+  description = "Enable nested virtualization"
+  type        = bool
+  default     = false
+}
+
 # =============================================================================
 # INSTANCE PURCHASING CONFIGURATION
 # =============================================================================

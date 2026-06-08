@@ -23,6 +23,10 @@ resource "aws_launch_template" "agent_launch_template" {
 
   instance_type = split(",", var.instance_types)[0]
 
+  cpu_options {
+    enable_nested_virtualization = var.enable_nested_virtualization ? "enabled" : "disabled"
+  }
+
   #tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds IMDS token requirement is configurable via var.imdsv2_tokens (defaults to "optional")
   metadata_options {
     http_tokens                 = var.imdsv2_tokens
